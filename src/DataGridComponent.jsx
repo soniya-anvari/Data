@@ -2,7 +2,7 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Checkbox } from '@mui/material';
 
-const DataGridComponent = ({ rows, selectedRows, onRowSelection, toggleSelectAll }) => {
+const DataGridComponent = ({ rows, selectedRows, onRowSelection, toggleSelectAll, selectedColumns }) => {
   return (
     <div>
       <DataGrid
@@ -19,10 +19,11 @@ const DataGridComponent = ({ rows, selectedRows, onRowSelection, toggleSelectAll
               />
             ),
           },
-          { field: 'col1', headerName: 'Name', width: 300 },
-          { field: 'col2', headerName: 'Company', width: 300 },
-          { field: 'col3', headerName: 'City', width: 300 },
-          { field: 'col4', headerName: 'State', width: 300 },
+          ...selectedColumns.map(field => ({
+            field,
+            headerName: field.charAt(0).toUpperCase() + field.slice(1),
+            width: 300,
+          })),
         ]}
         pageSize={5}
         checkboxSelection={false} // Disable the default checkbox selection

@@ -31,7 +31,6 @@ const FilterDialog = ({ open, onClose, onFilterChange }) => {
       <DialogContent>
         <div>
           <strong style={{ fontWeight: 'bold' }}>City</strong>
-          <br />
           {cities.map((city) => (
             <FormControlLabel
               key={city}
@@ -47,7 +46,6 @@ const FilterDialog = ({ open, onClose, onFilterChange }) => {
         </div>
         <div style={{ marginTop: '20px' }}>
           <strong style={{ fontWeight: 'bold' }}>Company</strong>
-          <br />
           {companies.map((company) => (
             <FormControlLabel
               key={company}

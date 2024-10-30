@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { Button, TextField, Checkbox } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import ColumnDialog from './ColumnDialog';
 import FilterDialog from './FilterDialog';
 import DataGridComponent from './DataGridComponent';
 import './index.css'; // Import CSS for styling
 
 const columns = [
-  { field: 'col1', headerName: 'Name', width: 300 },
-  { field: 'col2', headerName: 'Company', width: 300 },
-  { field: 'col3', headerName: 'City', width: 300 },
-  { field: 'col4', headerName: 'State', width: 300 },
+  { field: 'name', headerName: 'Name', width: 300 },
+  { field: 'company', headerName: 'Company', width: 300 },
+  { field: 'city', headerName: 'City', width: 300 },
+  { field: 'state', headerName: 'State', width: 300 },
 ];
 
 const rows = [
-  { id: 1, col1: 'Jone James', col2: 'Example', col3: "Yonkers", col4: "NY" },
-  { id: 2, col1: 'Bob Herm', col2: 'Example', col3: "Tampa", col4: "FL" },
-  { id: 3, col1: 'Kaui Ignace', col2: 'Example', col3: "Tampa", col4: "NY" },
-  { id: 4, col1: 'Christian', col2: 'Example', col3: "Yonkers", col4: "FL" },
-  { id: 5, col1: 'Deep Pau', col2: 'Example', col3: "Tampa", col4: "NY" },
-  { id: 6, col1: 'Marciano', col2: 'Example', col3: "Yonkers", col4: "FL" },
+  { id: 1, name: 'Jone James', company: 'Example', city: "Yonkers", state: "NY" },
+  { id: 2, name: 'Bob Herm', company: 'Example', city: "Tampa", state: "FL" },
+  { id: 3, name: 'Kaui Ignace', company: 'Example', city: "Tampa", state: "NY" },
+  { id: 4, name: 'Christian', company: 'Example', city: "Yonkers", state: "FL" },
+  { id: 5, name: 'Deep Pau', company: 'Example', city: "Tampa", state: "NY" },
+  { id: 6, name: 'Marciano', company: 'Example', city: "Yonkers", state: "FL" },
 ];
 
 const App = () => {
@@ -27,6 +26,8 @@ const App = () => {
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [filters, setFilters] = useState({ cities: [], companies: [] });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedColumns, setSelectedColumns] = useState(columns.map(col => col.field)); // All columns selected by default
 
   const handleOpenColumns = () => setOpenColumns(true);
   const handleCloseColumns = () => setOpenColumns(false);
@@ -52,6 +53,16 @@ const App = () => {
     setFilters(newFilters);
   };
 
+  const filteredRows = rows.filter(row => {
+    const matchesCityFilter = filters.cities.length === 0 || filters.cities.includes(row.city);
+    const matchesCompanyFilter = filters.companies.length === 0 || filters.companies.includes(row.company);
+    const matchesSearchTerm = searchTerm === '' || Object.values(row).some(value => 
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return matchesCityFilter && matchesCompanyFilter && matchesSearchTerm;
+  });
+
   return (
     <div style={{ height: 400, width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -59,6 +70,8 @@ const App = () => {
           label="Search"
           variant="outlined"
           size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           style={{ margin: '10px 0', width: '200px' }}
         />
         <div>
@@ -76,16 +89,20 @@ const App = () => {
       </div>
 
       <DataGridComponent
-        rows={rows.filter(row => 
-          (filters.cities.length === 0 || filters.cities.includes(row.col3)) &&
-          (filters.companies.length === 0 || filters.companies.includes(row.col2))
-        )}
+        rows={filteredRows}
         selectedRows={selectedRows}
         onRowSelection={handleRowSelection}
         toggleSelectAll={toggleSelectAll}
+        selectedColumns={selectedColumns} // Pass selected columns to DataGridComponent
       />
 
-      <ColumnDialog open={openColumns} onClose={handleCloseColumns} columns={columns} />
+      <ColumnDialog 
+        open={openColumns} 
+        onClose={handleCloseColumns} 
+        columns={columns} 
+        selectedColumns={selectedColumns} 
+        onColumnSelectionChange={setSelectedColumns} // Handle column selection change
+      />
       <FilterDialog open={openFilter} onClose={handleCloseFilter} onFilterChange={handleFilterChange} />
     </div>
   );
